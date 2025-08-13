@@ -16,7 +16,7 @@ class LoginScreen extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Image.asset(
-                'assets/images/logo.png', // Substitua pelo seu logo real
+                'assets/images/logo.png',
                 height: 100,
               ),
               const SizedBox(height: 20),

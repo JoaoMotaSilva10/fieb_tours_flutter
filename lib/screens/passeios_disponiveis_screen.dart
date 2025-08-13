@@ -1,38 +1,52 @@
 import 'package:flutter/material.dart';
-import 'passeios_comprados_screen.dart';
-import 'avaliacoes_screen.dart';
 
 class PasseiosDisponiveisScreen extends StatelessWidget {
+  final List<String> passeios = [
+    'Passeio ao Museu de Arte',
+    'Visita ao Planetário',
+    'Passeio ao Zoológico',
+  ];
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Passeios Disponíveis')),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text('Lista de passeios aqui', style: TextStyle(fontSize: 18)),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => PasseiosCompradosScreen()),
-                );
-              },
-              child: Text('Ver Passeios Comprados'),
+      appBar: AppBar(
+        title: Text('Passeios Disponíveis'),
+        backgroundColor: Color(0xFF4C89AC),
+      ),
+      body: ListView.builder(
+        padding: const EdgeInsets.all(16),
+        itemCount: passeios.length,
+        itemBuilder: (context, index) {
+          return Card(
+            margin: const EdgeInsets.symmetric(vertical: 8),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
             ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => AvaliacoesScreen()),
-                );
-              },
-              child: Text('Ver Avaliações'),
+            elevation: 4,
+            child: ListTile(
+              title: Text(
+                passeios[index],
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              trailing: ElevatedButton(
+                onPressed: () {
+                  // Aqui vai a lógica de comprar/reservar o passeio
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Passeio reservado!')),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Color(0xFF4C89AC),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+                child: Text('Reservar'),
+              ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
