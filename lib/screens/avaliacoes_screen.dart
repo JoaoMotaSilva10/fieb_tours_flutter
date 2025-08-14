@@ -6,8 +6,18 @@ class AvaliacoesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final passeiosFeitos = [
-      {"nome": "Museu Catavento", "imagem": "assets/images/catavento.jpg"},
-      {"nome": "Passeio para Santos", "imagem": "assets/images/santos.jpg"},
+      {
+        "nome": "Museu Catavento",
+        "imagem": "assets/images/catavento.jpg",
+        "valor": "R\$35,00",
+        "data": "12/07/2024"
+      },
+      {
+        "nome": "Passeio para Santos",
+        "imagem": "assets/images/santos.jpg",
+        "valor": "R\$80,00",
+        "data": "05/08/2024"
+      },
     ];
 
     return Scaffold(
@@ -18,17 +28,22 @@ class AvaliacoesScreen extends StatelessWidget {
             Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(height: 40),
-                  const Text("Para Avaliar",
-                      style: TextStyle(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF4C89AC))),
-                  const SizedBox(height: 12),
-                  const Text("Seus passeios disponíveis:",
-                      style: TextStyle(fontSize: 16, color: Colors.black87)),
+                  const Text(
+                    "Para Avaliar",
+                    style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF4C89AC),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  const Text(
+                    "Veja quais passeios você já fez e deixe sua opinião!",
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
+                    textAlign: TextAlign.center,
+                  ),
                   const SizedBox(height: 20),
                   Expanded(
                     child: ListView.builder(
@@ -36,6 +51,7 @@ class AvaliacoesScreen extends StatelessWidget {
                       itemBuilder: (context, index) {
                         final passeio = passeiosFeitos[index];
                         return Card(
+                          color: const Color(0xFFEDEDED),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
                           margin: const EdgeInsets.only(bottom: 16),
@@ -44,17 +60,66 @@ class AvaliacoesScreen extends StatelessWidget {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(passeio["nome"]!,
-                                    style: const TextStyle(
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                        color: Color(0xFF4C89AC))),
+                                Text(
+                                  passeio["nome"]!,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF4C89AC),
+                                  ),
+                                ),
                                 const SizedBox(height: 8),
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(8),
-                                  child: Image.asset(passeio["imagem"]!,
-                                      height: 120, fit: BoxFit.cover),
+                                  child: Image.asset(
+                                    passeio["imagem"]!,
+                                    height: 120,
+                                    fit: BoxFit.cover,
+                                  ),
                                 ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  "Valor: ${passeio["valor"]}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                Text(
+                                  "Data da excursão: ${passeio["data"]}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Color(0xFF4C89AC),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // Lógica para ver avaliações
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            Colors.grey[400], // cinza
+                                      ),
+                                      child: const Text("Ver Avaliações"),
+                                    ),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        // Lógica para dar avaliação
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor:
+                                            const Color(0xFF4C89AC),
+                                      ),
+                                      child: const Text("Dar Avaliação"),
+                                    ),
+                                  ],
+                                )
                               ],
                             ),
                           ),
@@ -72,11 +137,10 @@ class AvaliacoesScreen extends StatelessWidget {
                 icon: const Icon(Icons.arrow_back, color: Color(0xFF4C89AC)),
                 onPressed: () => Navigator.pop(context),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 }
-

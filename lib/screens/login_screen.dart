@@ -20,18 +20,13 @@ class LoginScreen extends StatelessWidget {
                 height: 100,
               ),
               const SizedBox(height: 20),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text('Entrar\nAluno',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
-                  SizedBox(width: 20),
-                  Icon(Icons.account_circle, size: 40, color: Colors.grey),
-                  SizedBox(width: 8),
-                  Text('Microsoft',
-                      style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-                ],
+              const Text(
+                'FIEB Tours Educativo',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF4C89AC),
+                ),
               ),
               const SizedBox(height: 20),
               TextField(

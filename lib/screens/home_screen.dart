@@ -24,7 +24,10 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.school, size: 60, color: Color(0xFF4C89AC)),
+              Image.asset(
+                'assets/images/logo.png',
+                height: 100,
+              ),
 
               SizedBox(height: 20),
               Text(
