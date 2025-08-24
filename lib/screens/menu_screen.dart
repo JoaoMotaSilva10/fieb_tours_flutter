@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'seus_passeios_screen.dart';
-import 'passeios_disponiveis_screen.dart';
+import '../models/aluno.dart';
 import 'avaliacoes_screen.dart';
+import 'passeios_disponiveis_screen.dart';
+import 'seus_passeios_screen.dart';
 
 class MenuScreen extends StatelessWidget {
+  final Aluno aluno;
+
+  const MenuScreen({super.key, required this.aluno});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,10 +22,10 @@ class MenuScreen extends StatelessWidget {
                 children: [
                   Image.asset('assets/images/logo.png', height: 50),
                   const SizedBox(width: 10),
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
+                      const Text(
                         'Olá Aluno,',
                         style: TextStyle(
                           fontSize: 20,
@@ -29,52 +34,53 @@ class MenuScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        'Fulano de Tal',
-                        style: TextStyle(
+                        aluno.nome,
+                        style: const TextStyle(
                           fontSize: 18,
                           color: Color(0xFF4C89AC),
                         ),
                       ),
                     ],
-                  )
+                  ),
                 ],
               ),
               const SizedBox(height: 40),
-
-              // Botões do menu com navegação
               _menuItem(Icons.insert_emoticon, 'Avaliações', () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => AvaliacoesScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => AvaliacoesScreen(aluno: aluno),
+                  ),
                 );
               }),
               const SizedBox(height: 20),
-
               _menuItem(Icons.directions, 'Passeios Disponíveis', () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => PasseiosDisponiveisScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => PasseiosDisponiveisScreen(aluno: aluno),
+                  ),
                 );
               }),
               const SizedBox(height: 20),
-
               _menuItem(Icons.favorite_border, 'Seus Passeios', () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (_) => SeusPasseiosScreen()),
+                  MaterialPageRoute(
+                    builder: (_) => SeusPasseiosScreen(aluno: aluno),
+                  ),
                 );
               }),
-
               const Spacer(),
               Align(
                 alignment: Alignment.bottomRight,
                 child: IconButton(
-                  icon: Icon(Icons.arrow_back_ios),
+                  icon: const Icon(Icons.arrow_back_ios),
                   onPressed: () {
-                    Navigator.pop(context); // Volta para tela anterior
+                    Navigator.pop(context);
                   },
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -87,12 +93,12 @@ class MenuScreen extends StatelessWidget {
       onPressed: onTap,
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.white,
-        foregroundColor: Color(0xFF4C89AC),
+        foregroundColor: const Color(0xFF4C89AC),
         elevation: 4,
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 24),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 24),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
-          side: BorderSide(color: Color(0xFF4C89AC)),
+          side: const BorderSide(color: Color(0xFF4C89AC)),
         ),
       ),
       child: Row(
@@ -101,7 +107,7 @@ class MenuScreen extends StatelessWidget {
           const SizedBox(width: 16),
           Text(
             label,
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ],
       ),

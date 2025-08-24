@@ -1,9 +1,53 @@
 import 'package:flutter/material.dart';
+import '../api/api_service.dart';
+import '../models/aluno.dart';
 import 'menu_screen.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
+  const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController rmController = TextEditingController();
   final TextEditingController senhaController = TextEditingController();
+  bool isLoading = false;
+
+  void login() async {
+    final rm = rmController.text.trim();
+    final senha = senhaController.text.trim();
+
+    if (rm.isEmpty || senha.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Preencha RM e Senha')),
+      );
+      return;
+    }
+
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final Aluno aluno = await ApiService.login(rm, senha);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => MenuScreen(aluno: aluno),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString())),
+      );
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,10 +59,7 @@ class LoginScreen extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Image.asset(
-                'assets/images/logo.png',
-                height: 100,
-              ),
+              Image.asset('assets/images/logo.png', height: 100),
               const SizedBox(height: 20),
               const Text(
                 'FIEB Tours Educativo',
@@ -32,9 +73,10 @@ class LoginScreen extends StatelessWidget {
               TextField(
                 controller: rmController,
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.person),
+                  prefixIcon: const Icon(Icons.person),
                   labelText: 'RM',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30)),
                 ),
               ),
               const SizedBox(height: 16),
@@ -42,29 +84,25 @@ class LoginScreen extends StatelessWidget {
                 controller: senhaController,
                 obscureText: true,
                 decoration: InputDecoration(
-                  prefixIcon: Icon(Icons.vpn_key),
+                  prefixIcon: const Icon(Icons.vpn_key),
                   labelText: 'Senha',
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(30)),
+                  border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(30)),
                 ),
               ),
               const SizedBox(height: 20),
               ElevatedButton(
-                onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (_) => MenuScreen()),
-                  );
-                },
+                onPressed: isLoading ? null : login,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF4C89AC),
-                  padding: const EdgeInsets.symmetric(horizontal: 50, vertical: 14),
+                  backgroundColor: const Color(0xFF4C89AC),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 50, vertical: 14),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                 ),
-                child: const Text(
-                  'Entrar',
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: isLoading
+                    ? const CircularProgressIndicator(color: Colors.white)
+                    : const Text('Entrar', style: TextStyle(fontSize: 16)),
               ),
             ],
           ),
