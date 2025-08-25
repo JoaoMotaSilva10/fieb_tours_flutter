@@ -1,16 +1,14 @@
 class Avaliacao {
   int id;
   int passeioId;
-  int usuarioId; 
-  String usuario; 
+  int alunoId;
   int nota;
   String comentario;
 
   Avaliacao({
     required this.id,
     required this.passeioId,
-    required this.usuarioId,
-    required this.usuario,
+    required this.alunoId,
     required this.nota,
     required this.comentario,
   });
@@ -18,11 +16,10 @@ class Avaliacao {
   factory Avaliacao.fromJson(Map<String, dynamic> json) {
     return Avaliacao(
       id: json['id'],
-      passeioId: json['passeioId'],
-      usuarioId: json['usuarioId'], 
-      usuario: json['usuario'] ?? 'Anônimo',
+      passeioId: json['passeioId'] ?? json['passeio_id'], // garante compatibilidade
+      alunoId: json['alunoId'] ?? json['aluno_id'],
       nota: json['nota'],
-      comentario: json['comentario'],
+      comentario: json['comentario'] ?? '',
     );
   }
 
@@ -30,7 +27,7 @@ class Avaliacao {
     return {
       'id': id,
       'passeioId': passeioId,
-      'usuarioId': usuarioId, 
+      'alunoId': alunoId,
       'nota': nota,
       'comentario': comentario,
     };

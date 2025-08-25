@@ -52,7 +52,7 @@ class _VerAvaliacoesScreenState extends State<VerAvaliacoesScreen> {
                       child: ListTile(
                         title: Text("⭐ ${avaliacao.nota}/5"),
                         subtitle: Text(avaliacao.comentario),
-                        trailing: Text(avaliacao.usuario),
+                        trailing: Text("Aluno ${avaliacao.alunoId}"),
                       ),
                     );
                   },

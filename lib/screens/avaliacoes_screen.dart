@@ -24,7 +24,9 @@ class _AvaliacoesScreenState extends State<AvaliacoesScreen> {
   }
 
   Future<void> fetchPasseios() async {
-    final response = await http.get(Uri.parse("http://localhost:8080/api/passeios"));
+    final response = await http.get(
+      Uri.parse("http://localhost:8080/api/passeios"),
+    );
     if (response.statusCode == 200) {
       setState(() {
         passeios = json.decode(response.body);
@@ -63,7 +65,7 @@ class _AvaliacoesScreenState extends State<AvaliacoesScreen> {
           final passeio = passeios[index];
           return Card(
             child: ListTile(
-              title: Text(passeio["nome"]),
+              title: Text(passeio["titulo"] ?? ""),
               subtitle: Text(passeio["descricao"] ?? ""),
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
