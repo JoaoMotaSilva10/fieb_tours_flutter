@@ -14,14 +14,14 @@ class Passeio {
   });
 
   factory Passeio.fromJson(Map<String, dynamic> json) {
-    return Passeio(
-      id: json['id'],
-      nome: json['nome'],
-      imagem: json['imagem'],
-      preco: (json['preco'] as num).toDouble(),
-      data: json['data'],
-    );
-  }
+  return Passeio(
+    id: json['id'],
+    nome: json['titulo'] ?? 'Sem título', 
+    imagem: json['imagem'] ?? 'https://picsum.photos/200/150',
+    preco: (json['preco'] as num?)?.toDouble() ?? 0.0,
+    data: json['data'] ?? '',
+  );
+}
 
   Map<String, dynamic> toJson() {
     return {

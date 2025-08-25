@@ -16,10 +16,11 @@ class _SeusPasseiosScreenState extends State<SeusPasseiosScreen> {
   late Future<List<Passeio>> _meusPasseios;
 
   @override
-  void initState() {
-    super.initState();
-    _meusPasseios = ApiService.getPasseiosUsuario(widget.aluno.id);
-  }
+void initState() {
+  super.initState();
+  _meusPasseios = ApiService.getPasseiosReservados(widget.aluno.id);
+}
+
 
   @override
   Widget build(BuildContext context) {
