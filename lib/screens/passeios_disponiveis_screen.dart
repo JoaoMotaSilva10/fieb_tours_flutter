@@ -22,6 +22,31 @@ class _PasseiosDisponiveisScreenState extends State<PasseiosDisponiveisScreen> {
     _passeiosFuture = ApiService.getPasseios();
   }
 
+  String formatarData(String? dataString) {
+    if (dataString == null || dataString.isEmpty) return '';
+    final data = DateTime.tryParse(dataString);
+    if (data == null) return '';
+    return "${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}";
+  }
+
+  // ========================
+  // FUNÇÃO PARA RESERVAR
+  // ========================
+  Future<void> _reservarPasseio(Passeio passeio) async {
+    try {
+      // Aqui seguimos exatamente a assinatura do ApiService
+      await ApiService.reservarPasseio(passeio, widget.aluno);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Passeio reservado com sucesso!')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao reservar: $e')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,60 +65,150 @@ class _PasseiosDisponiveisScreenState extends State<PasseiosDisponiveisScreen> {
           final passeios = snapshot.data!;
 
           return ListView.builder(
+            padding: const EdgeInsets.all(12),
             itemCount: passeios.length,
             itemBuilder: (context, index) {
               final passeio = passeios[index];
+
               return Card(
-                margin: const EdgeInsets.all(12),
-                child: Padding(
-                  padding: const EdgeInsets.all(12.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        passeio.nome,
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                elevation: 5,
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () {
+                    showDialog(
+                      context: context,
+                      builder: (_) => PasseioDetailPopup(passeio: passeio),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Row(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.network(
+                            'https://picsum.photos/seed/${passeio.id}/120/80',
+                            width: 120,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 8),
-                      Image.network(
-                        passeio.imagem,
-                        height: 120,
-                        fit: BoxFit.cover,
-                      ),
-                      const SizedBox(height: 8),
-                      Text("Valor: R\$${passeio.preco}"),
-                      Text("Data: ${passeio.data}"),
-                      const SizedBox(height: 12),
-                      Center(
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            try {
-                              await ApiService.reservarPasseio(
-                                passeio.id,
-                                widget.aluno.id,
-                              );
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Passeio reservado!')),
-                              );
-                            } catch (e) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('Erro ao reservar: $e')),
-                              );
-                            }
-                          },
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                passeio.nome,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text("Valor: R\$${passeio.preco.toStringAsFixed(2)}"),
+                              Text("Início Recebimento: ${formatarData(passeio.dataInicioRecebimento)}"),
+                            ],
+                          ),
+                        ),
+                        ElevatedButton(
+                          onPressed: () => _reservarPasseio(passeio),
                           child: const Text("Reservar"),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               );
             },
           );
         },
+      ),
+    );
+  }
+}
+
+// ========================
+// POPUP DE DETALHE
+// ========================
+class PasseioDetailPopup extends StatelessWidget {
+  final Passeio passeio;
+
+  const PasseioDetailPopup({required this.passeio, super.key});
+
+  String formatarData(String? dataString) {
+    if (dataString == null || dataString.isEmpty) return '';
+    final data = DateTime.tryParse(dataString);
+    if (data == null) return '';
+    return "${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}/${data.year}";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Dialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(25)),
+      insetPadding: const EdgeInsets.all(20),
+      child: SingleChildScrollView(
+        child: SizedBox(
+          width: double.infinity,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(25)),
+                child: Image.network(
+                  'https://picsum.photos/seed/${passeio.id}/600/300',
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      passeio.nome,
+                      style: const TextStyle(
+                          fontSize: 22, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text("Descrição: ${passeio.descricao}"),
+                    const SizedBox(height: 6),
+                    Text("Valor: R\$${passeio.preco.toStringAsFixed(2)}"),
+                    Text("Data passeio: ${formatarData(passeio.dataPasseio)}"),
+                    Text("Hora Saída: ${passeio.horaSaida}"),
+                    Text("Hora Chegada: ${passeio.horaChegada}"),
+                    Text("Início Recebimento: ${formatarData(passeio.dataInicioRecebimento)}"),
+                    Text("Fim Recebimento: ${formatarData(passeio.dataFinalRecebimento)}"),
+                    Text("Cadastro: ${formatarData(passeio.dataCadastro)}"),
+                    Text("Status: ${passeio.statusPasseio}"),
+                    const SizedBox(height: 16),
+                    Center(
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.blueAccent,
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 30, vertical: 12),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20)),
+                        ),
+                        onPressed: () => Navigator.pop(context),
+                        child: const Text("Fechar"),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
