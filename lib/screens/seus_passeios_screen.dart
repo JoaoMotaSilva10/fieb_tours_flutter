@@ -24,28 +24,56 @@ class _SeusPasseiosScreenState extends State<SeusPasseiosScreen> {
   }
 
   Future<List<Passeio>> fetchPasseiosReservados() async {
-    final url = Uri.parse('$baseUrl/reservas'); 
-    final response = await http.get(url);
+    // Busca as reservas
+    final reservasUrl = Uri.parse('$baseUrl/reservas');
+    final reservasResponse = await http.get(reservasUrl);
 
-    if (response.statusCode != 200) {
-      throw Exception('Erro ao carregar reservas: ${response.statusCode}');
+    if (reservasResponse.statusCode != 200) {
+      throw Exception('Erro ao carregar reservas: ${reservasResponse.statusCode}');
     }
 
-    // Decodifica o corpo como lista
-    final List<dynamic> data = json.decode(response.body);
+    final List<dynamic> reservasData = json.decode(reservasResponse.body);
+    final alunoReservas = reservasData.where((reserva) => reserva['nome'] == widget.aluno.nome).toList();
 
-    // Filtra apenas as reservas do aluno logado
-    final alunoReservas = data.where((reserva) => reserva['nome'] == widget.aluno.nome).toList();
+    if (alunoReservas.isEmpty) return [];
 
-    // Converte cada reserva para um Passeio
-    return alunoReservas.map((reservaJson) {
-      return Passeio(
-        id: reservaJson['id'],
-        nome: reservaJson['passeio'], // o backend retorna 'passeio'
-        preco: (reservaJson['preco'] ?? 0).toDouble(),
-        dataPasseio: reservaJson['dataPasseio'] ?? '', // ajuste conforme seu backend
+    // Busca todos os passeios
+    final passeiosUrl = Uri.parse('$baseUrl/passeios');
+    final passeiosResponse = await http.get(passeiosUrl);
+
+    if (passeiosResponse.statusCode != 200) {
+      throw Exception('Erro ao carregar passeios: ${passeiosResponse.statusCode}');
+    }
+
+    final List<dynamic> passeiosData = json.decode(passeiosResponse.body);
+
+    // Combina reservas com dados dos passeios
+    List<Passeio> passeiosReservados = [];
+    
+    for (var reserva in alunoReservas) {
+      final passeioEncontrado = passeiosData.firstWhere(
+        (passeio) => passeio['nome'] == reserva['passeio'],
+        orElse: () => null,
       );
-    }).toList();
+
+      if (passeioEncontrado != null) {
+        passeiosReservados.add(Passeio(
+          id: passeioEncontrado['id'],
+          nome: passeioEncontrado['nome'],
+          descricao: passeioEncontrado['descricao'] ?? '',
+          dataPasseio: passeioEncontrado['dataPasseio'] ?? '',
+          preco: (passeioEncontrado['preco'] ?? 0).toDouble(),
+          horaSaida: passeioEncontrado['horaSaida'] ?? '',
+          horaChegada: passeioEncontrado['horaChegada'] ?? '',
+          dataInicioRecebimento: passeioEncontrado['dataInicioRecebimento'] ?? '',
+          dataFinalRecebimento: passeioEncontrado['dataFinalRecebimento'] ?? '',
+          dataCadastro: passeioEncontrado['dataCadastro'] ?? '',
+          statusPasseio: passeioEncontrado['statusPasseio'] ?? '',
+        ));
+      }
+    }
+
+    return passeiosReservados;
   }
 
   String formatarData(String dataString) {
