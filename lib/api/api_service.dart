@@ -7,7 +7,9 @@ import '../models/avaliacao.dart';
 class ApiService {
   static const String baseUrl = 'http://localhost:8080/api';
 
-  // Login retorna um objeto Aluno
+  // ========================
+  // LOGIN
+  // ========================
   static Future<Aluno> login(String rm, String senha) async {
     try {
       final response = await http.post(
@@ -27,7 +29,9 @@ class ApiService {
     }
   }
 
-  // Registrar novo aluno
+  // ========================
+  // REGISTRO DE ALUNO
+  // ========================
   static Future<Aluno> registrarAluno(Aluno aluno) async {
     try {
       final response = await http.post(
@@ -46,8 +50,34 @@ class ApiService {
       throw Exception('Erro ao conectar com o servidor: $e');
     }
   }
+// ========================
+// PASSEIOS RESERVADOS
+// ========================
+static Future<List<Passeio>> getPasseiosReservados(String alunoRm) async {
+  try {
+    final response = await http.get(
+      Uri.parse('$baseUrl/reservas/aluno/$alunoRm'), // backend deve aceitar RM
+      headers: {'Content-Type': 'application/json'},
+    );
 
-  // Buscar todos os passeios disponíveis
+    if (response.statusCode == 200) {
+      final List<dynamic> jsonList = jsonDecode(response.body);
+      // Cada reserva tem um campo 'passeio' com os dados do passeio
+      return jsonList.map((reserva) {
+        final passeioJson = reserva['passeio']; // depende de como o backend retorna
+        return Passeio.fromJson(passeioJson);
+      }).toList();
+    } else {
+      throw Exception('Erro ao buscar passeios reservados: ${response.body}');
+    }
+  } catch (e) {
+    throw Exception('Erro ao conectar com o servidor: $e');
+  }
+}
+
+  // ========================
+  // PASSEIOS
+  // ========================
   static Future<List<Passeio>> getPasseios() async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/passeios'));
@@ -64,7 +94,6 @@ class ApiService {
     }
   }
 
-  // Buscar passeios do usuário
   static Future<List<Passeio>> getPasseiosUsuario(int alunoId) async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/passeios/usuario/$alunoId'));
@@ -80,28 +109,36 @@ class ApiService {
       throw Exception('Erro ao conectar com o servidor: $e');
     }
   }
+// ========================
+// RESERVAS
+// ========================
+static Future<void> reservarPasseio(Passeio passeio, Aluno aluno) async {
+  try {
+    // Monta o DTO correto conforme o backend espera
+    final dto = {
+      'passeioId': passeio.id,    // id do passeio
+      'alunoRm': aluno.rm,        // RM do aluno logado
+    };
 
-  // Reservar um passeio usando DTO { alunoId, passeioId }
-  static Future<void> reservarPasseio(int passeioId, int alunoId) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/reservas'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'alunoId': alunoId, 'passeioId': passeioId}),
-      );
+    final response = await http.post(
+      Uri.parse('$baseUrl/reservas'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(dto),
+    );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        return;
-      } else {
-        final msg = _getErrorMessage(response);
-        throw Exception('Erro ao reservar passeio: $msg');
-      }
-    } catch (e) {
-      throw Exception('Erro ao conectar com o servidor: $e');
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      final msg = _getErrorMessage(response);
+      throw Exception('Erro ao reservar passeio: $msg');
     }
+  } catch (e) {
+    throw Exception('Erro ao conectar com o servidor: $e');
   }
+}
 
-  // Buscar avaliações de um passeio
+
+  // ========================
+  // AVALIAÇÕES
+  // ========================
   static Future<List<Avaliacao>> getAvaliacoes(int passeioId) async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/avaliacoes/passeio/$passeioId'));
@@ -118,7 +155,6 @@ class ApiService {
     }
   }
 
-  // Enviar avaliação
   static Future<void> enviarAvaliacao(int passeioId, int alunoId, int nota, String comentario) async {
     try {
       final response = await http.post(
@@ -141,7 +177,9 @@ class ApiService {
     }
   }
 
-  // Função interna para extrair mensagem de erro do backend
+  // ========================
+  // MÉTODOS INTERNOS
+  // ========================
   static String _getErrorMessage(http.Response response) {
     try {
       final data = jsonDecode(response.body);
@@ -150,18 +188,5 @@ class ApiService {
       return response.body.isNotEmpty ? response.body : 'Erro desconhecido';
     }
   }
-
-  // Busca os passeios reservados pelo aluno
-static Future<List<Passeio>> getPasseiosReservados(int alunoId) async {
-  final response = await http.get(Uri.parse('$baseUrl/reservas/aluno/$alunoId'));
-
-  if (response.statusCode == 200) {
-    final List<dynamic> jsonList = jsonDecode(response.body);
-    // Cada reserva retorna um objeto com "passeio", pegamos apenas o passeio
-    return jsonList.map((e) => Passeio.fromJson(e['passeio'])).toList();
-  }
-
-  throw Exception('Erro ao buscar passeios do usuário: ${response.body}');
 }
 
-}
